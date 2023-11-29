@@ -17,7 +17,7 @@ let player = {
   movement: 0,
 };
 
-let obstacles = [{ y: 350, x: canvas.width }];
+let obstacles = [];
 
 let lastTime = Date.now();
 
@@ -71,17 +71,29 @@ const drawPlayer = (playerObj) => {
 const drawObstacles = (obstacles) => {
   for (let i = 0; i < obstacles.length; i++) {
     let currentObstacle = obstacles[i];
-    ctx.fillRect(currentObstacle.x, 0, 70, currentObstacle.y - 50);
-    ctx.fillRect(currentObstacle.x, currentObstacle.y + 50, 70, canvas.height);
+    ctx.fillRect(currentObstacle.x, currentObstacle.y, 70, currentObstacle.height);
   }
 };
 
 const generateObstacles = () => {
-  let yPos = Math.random() * canvas.height;
+  let yPos = Math.floor(Math.random() * canvas.height);
   let xPos = canvas.width;
-  yPos < 200 ? (yPos = 200) : (yPos = yPos);
+  yPos < 275 ? (yPos = 275) : (yPos = yPos);
   yPos > canvas.height - 200 ? (yPos = canvas.height - 200) : (yPos = yPos);
-  obstacles.push({ y: yPos, x: xPos });
+  obstacles.push({ x: xPos, y: 0, height: yPos - 75 }, {x: xPos, y: yPos, height: canvas.height - yPos});
+};
+
+const registerCollision = (rect1, rect2) => {
+  if (
+    rect1.x < rect2.x + rect2.width &&
+    rect1.x + rect1.width > rect2.x &&
+    rect1.y < rect2.y + rect2.height &&
+    rect1.y + rect1.height > rect2.y
+  ) {
+    return true;
+  } else {
+    return false;
+  }
 };
 
 window.addEventListener("keydown", function (event) {
