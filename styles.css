@@ -6,3 +6,12 @@ body {
 #canvas {
   border: 3px solid black;
 }
+
+#restart{
+  display: none;
+  position: absolute;
+  width: 10%;
+  height: 5%;
+  top: 45vh;
+  left: 45vw;
+}

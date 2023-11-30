@@ -1,4 +1,5 @@
 const canvas = document.getElementById("canvas");
+const score = document.getElementById("score");
 
 const ctx = canvas.getContext("2d");
 canvas.width = 500;
@@ -6,7 +7,7 @@ canvas.height = 700;
 
 let bgImg = new Image();
 bgImg.src = "./images/background.png";
-ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+
 
 let player = {
   width: 50,
@@ -17,14 +18,15 @@ let player = {
   movement: 0,
 };
 
+let playing = (false);
 let obstacles = [];
-
+let points = 0;
 let lastTime = Date.now();
 
 let spawnTimer = 200;
 
 const tick = () => {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
   let now = Date.now();
   let deltaTime = (now - lastTime) / 1000;
@@ -35,6 +37,8 @@ const tick = () => {
   for (let i = 0; i < obstacles.length; i++) {
     obstacles[i].x -= 1;
   }
+
+  score.innerText = points;
 
   if (spawnTimer <= 0) {
     generateObstacles();
@@ -51,10 +55,46 @@ const tick = () => {
   }
   player.y += player.movement;
 
-  requestAnimationFrame(tick);
+  for (let obstacle of obstacles) {
+     if (registerCollision(player, obstacle) || player.y - player.height > canvas.height || player.y + player.height < 0) {
+
+      endGame();
+    }
+  }
+
+
+  if (playing) {
+    requestAnimationFrame(tick);
+  }
 };
 
-requestAnimationFrame(tick);
+restartGame(); 
+
+const endGame = () => {
+  playing = false;
+  ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+  ctx.fillText("Press space to play again", canvas.width / 2, canvas.height / 2);
+  let playerName = prompt("Whats your name?");
+  localStorage.setItem(playerName, points);
+}
+
+const restartGame = () => {
+  const allScores = { ...localStorage };
+  console.log(allScores);
+  ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+  obstacles = [];
+  points = 0;
+  player = {
+    width: 50,
+    height: 40,
+    x: 100,
+    y: canvas.height / 2,
+    jump: false,
+    movement: 0,
+  };
+  playing = true;
+  requestAnimationFrame(tick);
+}
 
 const drawPlayer = (playerObj) => {
   let playerImg = new Image();
@@ -71,16 +111,21 @@ const drawPlayer = (playerObj) => {
 const drawObstacles = (obstacles) => {
   for (let i = 0; i < obstacles.length; i++) {
     let currentObstacle = obstacles[i];
-    ctx.fillRect(currentObstacle.x, currentObstacle.y, 70, currentObstacle.height);
+    ctx.fillRect(currentObstacle.x, currentObstacle.y, currentObstacle.width, currentObstacle.height);
+    if (currentObstacle.x <= 0 - currentObstacle.width) {
+      obstacles.splice(i, 2);
+      i - 2;
+      points++;
+    }
   }
 };
 
 const generateObstacles = () => {
-  let yPos = Math.floor(Math.random() * canvas.height);
+  let yPos = Math.floor(Math.random() * canvas.height);  
   let xPos = canvas.width;
   yPos < 275 ? (yPos = 275) : (yPos = yPos);
   yPos > canvas.height - 200 ? (yPos = canvas.height - 200) : (yPos = yPos);
-  obstacles.push({ x: xPos, y: 0, height: yPos - 75 }, {x: xPos, y: yPos, height: canvas.height - yPos});
+  obstacles.push({ x: xPos, y: 0, width: 70, height: yPos - 120 }, {x: xPos, y: yPos, width: 70, height: canvas.height - yPos});
 };
 
 const registerCollision = (rect1, rect2) => {
@@ -98,7 +143,11 @@ const registerCollision = (rect1, rect2) => {
 
 window.addEventListener("keydown", function (event) {
   if (event.key === " ") {
-    player.jump = true;
+    if (playing) {
+      player.jump = true;
+    } else {
+      restartGame();
+    }  
   }
 });
 
@@ -106,4 +155,4 @@ window.addEventListener("keyup", function (event) {
   if (event.key === " ") {
     player.jump = false;
   }
-});
+}); 
