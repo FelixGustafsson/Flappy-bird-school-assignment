@@ -78,7 +78,7 @@ const endGame = () => {
   localStorage.setItem(playerName, points);
 }
 
-const restartGame = () => {
+function restartGame() {
   const allScores = { ...localStorage };
   console.log(allScores);
   ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
