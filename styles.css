@@ -1,17 +1,49 @@
+html, body {
+  height: 100%; 
+  overflow: hidden
+}
+
 body {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 0.5fr 4fr 3fr 3fr 0.5fr;
+  background-color: darkslategray;
 }
 
 #canvas {
+  grid-column: 2 / 3;
   border: 3px solid black;
 }
 
-#restart{
-  display: none;
-  position: absolute;
-  width: 10%;
-  height: 5%;
-  top: 45vh;
-  left: 45vw;
+table {
+  width: 100%;
+  background-color: antiquewhite;
+  gap: 0.5rem;
+}
+
+th, td {
+  width: 50%;
+  padding: 0.5rem;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+td {
+  font-size: 1rem;
+}
+
+th {
+  font-size: 1.5rem;
+}
+
+#score {
+  font-size: 2rem;
+  color: orange;
+  align-self: center;
+  text-align: center;
+}
+
+#hi-scores {
+  overflow: hidden scroll;
 }
