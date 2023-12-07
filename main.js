@@ -1,5 +1,28 @@
 const canvas = document.getElementById("canvas");
 const score = document.getElementById("score");
+const highScores = document.getElementById("hi-scores");
+
+const renderScoreList = () => {
+  let scoresArray = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    const value = localStorage.getItem(localStorage.key(i));
+    const key = localStorage.key(i);
+    if (isNaN(value)) {
+      continue;
+    } else {
+      scoresArray.push({ key: key, value: value });
+    }
+  }
+  scoresArray.sort((a, b) => b.value - a.value);
+
+  for (let i = 0; i < scoresArray.length; i++) {
+    let currentScore = document.createElement("h1");
+    currentScore.innerText = scoresArray[i].key + ": " + scoresArray[i].value;
+    highScores.appendChild(currentScore);
+  }
+};
+
+highScores.addEventListener("load", renderScoreList());
 
 const ctx = canvas.getContext("2d");
 canvas.width = 500;
@@ -7,7 +30,6 @@ canvas.height = 700;
 
 let bgImg = new Image();
 bgImg.src = "./images/background.png";
-
 
 let player = {
   width: 50,
@@ -18,7 +40,7 @@ let player = {
   movement: 0,
 };
 
-let playing = (false);
+let playing = false;
 let obstacles = [];
 let points = 0;
 let lastTime = Date.now();
@@ -44,7 +66,7 @@ const tick = () => {
     generateObstacles();
     spawnTimer = 200;
   } else {
-    spawnTimer--;
+    spawnTimer--; //use deltatime here
   }
 
   if (player.jump) {
@@ -56,27 +78,36 @@ const tick = () => {
   player.y += player.movement;
 
   for (let obstacle of obstacles) {
-     if (registerCollision(player, obstacle) || player.y - player.height > canvas.height || player.y + player.height < 0) {
-
+    if (
+      registerCollision(player, obstacle) ||
+      player.y - player.height > canvas.height ||
+      player.y + player.height < 0
+    ) {
       endGame();
     }
   }
-
 
   if (playing) {
     requestAnimationFrame(tick);
   }
 };
 
-restartGame(); 
+restartGame();
 
 const endGame = () => {
   playing = false;
   ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-  ctx.fillText("Press space to play again", canvas.width / 2, canvas.height / 2);
+  ctx.font = "30px Arial";
+  ctx.fillText(
+    "Press space to play again",
+    canvas.width / 2 - 160,
+    canvas.height / 2 - 10
+  );
   let playerName = prompt("Whats your name?");
   localStorage.setItem(playerName, points);
-}
+  highScores.innerHTML = "";
+  renderScoreList();
+};
 
 function restartGame() {
   const allScores = { ...localStorage };
@@ -85,8 +116,8 @@ function restartGame() {
   obstacles = [];
   points = 0;
   player = {
-    width: 50,
-    height: 40,
+    width: 40,
+    height: 30,
     x: 100,
     y: canvas.height / 2,
     jump: false,
@@ -111,7 +142,12 @@ const drawPlayer = (playerObj) => {
 const drawObstacles = (obstacles) => {
   for (let i = 0; i < obstacles.length; i++) {
     let currentObstacle = obstacles[i];
-    ctx.fillRect(currentObstacle.x, currentObstacle.y, currentObstacle.width, currentObstacle.height);
+    ctx.fillRect(
+      currentObstacle.x,
+      currentObstacle.y,
+      currentObstacle.width,
+      currentObstacle.height
+    );
     if (currentObstacle.x <= 0 - currentObstacle.width) {
       obstacles.splice(i, 2);
       i - 2;
@@ -121,11 +157,14 @@ const drawObstacles = (obstacles) => {
 };
 
 const generateObstacles = () => {
-  let yPos = Math.floor(Math.random() * canvas.height);  
+  let yPos = Math.floor(Math.random() * canvas.height);
   let xPos = canvas.width;
   yPos < 275 ? (yPos = 275) : (yPos = yPos);
   yPos > canvas.height - 200 ? (yPos = canvas.height - 200) : (yPos = yPos);
-  obstacles.push({ x: xPos, y: 0, width: 70, height: yPos - 120 }, {x: xPos, y: yPos, width: 70, height: canvas.height - yPos});
+  obstacles.push(
+    { x: xPos, y: 0, width: 70, height: yPos - 120 },
+    { x: xPos, y: yPos, width: 70, height: canvas.height - yPos }
+  );
 };
 
 const registerCollision = (rect1, rect2) => {
@@ -147,7 +186,7 @@ window.addEventListener("keydown", function (event) {
       player.jump = true;
     } else {
       restartGame();
-    }  
+    }
   }
 });
 
@@ -155,4 +194,4 @@ window.addEventListener("keyup", function (event) {
   if (event.key === " ") {
     player.jump = false;
   }
-}); 
+});
