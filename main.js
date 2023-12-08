@@ -11,6 +11,9 @@ canvas.height = 600;
 // global variables
 let playing = false;
 const obstacles = [];
+const gapSize = 120;
+const minGapHeight = 200;
+const maxGapHeight = canvas.height - 125;
 let points = 0;
 let lastTime = Date.now();
 const spawnDelay = 4;
@@ -109,8 +112,6 @@ const tick = () => {
   }
 };
 
-startGame();
-
 // ends game, clears screen, updates high scores
 const endGame = () => {
   playing = false;
@@ -125,7 +126,7 @@ const endGame = () => {
   saveScore(playerName, points);
   highScores.innerHTML = "";
   renderScoreList();
-  // score.innerText = "";
+  score.innerText = "";
 };
 
 // Saves the latest score to local storage.
@@ -145,8 +146,8 @@ function startGame() {
   obstacles.length = 0;
   points = 0;
   player = {
-    width: 40,
-    height: 30,
+    width: 50,
+    height: 40,
     x: 100,
     y: canvas.height / 2,
     jump: false,
@@ -191,10 +192,10 @@ const drawObstacles = (obstacles) => {
 const generateObstacles = () => {
   let yPos = Math.floor(Math.random() * canvas.height);
   let xPos = canvas.width;
-  yPos < 200 ? (yPos = 200) : (yPos = yPos);
-  yPos > canvas.height - 125 ? (yPos = canvas.height - 125) : (yPos = yPos);
+  yPos < minGapHeight ? (yPos = minGapHeight) : (yPos = yPos);
+  yPos > maxGapHeight ? (yPos = maxGapHeight) : (yPos = yPos);
   obstacles.push(
-    { x: xPos, y: 0, width: 70, height: yPos - 120 },
+    { x: xPos, y: 0, width: 70, height: yPos - gapSize },
     { x: xPos, y: yPos, width: 70, height: canvas.height - yPos }
   );
 };
@@ -203,9 +204,9 @@ const generateObstacles = () => {
 const registerCollision = (rect1, rect2) => {
   if (
     rect1.x < rect2.x + rect2.width &&
-    rect1.x + rect1.width > rect2.x &&
+    rect1.x + rect1.width - 10 > rect2.x &&
     rect1.y < rect2.y + rect2.height &&
-    rect1.y + rect1.height > rect2.y
+    rect1.y + rect1.height - 10 > rect2.y
   ) {
     return true;
   } else {
@@ -229,4 +230,15 @@ window.addEventListener("keyup", function (event) {
   if (event.key === " ") {
     player.jump = false;
   }
+});
+
+// sets initial screen
+window.addEventListener("load", () => {
+  ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+  ctx.font = "30px Arial";
+  ctx.fillText(
+    "Press space to play",
+    canvas.width / 2 - 140,
+    canvas.height / 2 - 10
+  );
 });
