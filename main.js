@@ -3,12 +3,12 @@ const canvas = document.getElementById("canvas");
 const score = document.getElementById("score");
 const highScores = document.getElementById("hi-scores");
 
-// defines canvas
+// Defines canvas
 const ctx = canvas.getContext("2d");
 canvas.width = 500;
 canvas.height = 600;
 
-// global variables
+// Global variables
 let playing = false;
 const obstacles = [];
 const gapSize = 120;
@@ -29,7 +29,7 @@ let player = {
   movement: 0,
 };
 
-// generates high score list from local storage
+// Generates high score list from local storage
 const renderScoreList = () => {
   let scores = localStorage.getItem("hi-scores");
   let scoresArray = scores ? JSON.parse(scores) : [];
@@ -58,10 +58,10 @@ const renderScoreList = () => {
   highScores.append(table);
 };
 
-// loads high scores when page is loaded
+// Loads high scores when page is loaded
 highScores.addEventListener("load", renderScoreList());
 
-// tick function
+// Tick function
 const tick = () => {
   ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
 
@@ -84,7 +84,7 @@ const tick = () => {
     spawnTimer -= deltaTime;
   }
 
-  // moves player
+  // Moves player
   if (player.jump) {
     player.movement = 0;
     player.movement -= 2;
@@ -93,7 +93,7 @@ const tick = () => {
   }
   player.y += player.movement;
 
-  // checks for defeat
+  // Checks for defeat
   if (
     player.y - player.height > canvas.height ||
     player.y + player.height < 0
@@ -101,18 +101,25 @@ const tick = () => {
     endGame();
   }
   for (let obstacle of obstacles) {
-    if (registerCollision(player, obstacle)) {
+    if (
+      registerCollision(player, {
+        x: obstacle.x,
+        y: obstacle.y,
+        width: obstacle.width - 6,
+        height: obstacle.height - 6,
+      })
+    ) {
       endGame();
     }
   }
 
-  // if no defeat, calls tick function again
+  // If no defeat, calls tick function again
   if (playing) {
     requestAnimationFrame(tick);
   }
 };
 
-// ends game, clears screen, updates high scores
+// Ends game, clears screen, updates high scores
 const endGame = () => {
   playing = false;
   ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
@@ -140,7 +147,7 @@ function saveScore(name, score) {
   localStorage.setItem("hi-scores", JSON.stringify(scoresArray));
 }
 
-// starts or restarts the game
+// Starts or restarts the game
 function startGame() {
   ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
   obstacles.length = 0;
@@ -157,7 +164,7 @@ function startGame() {
   requestAnimationFrame(tick);
 }
 
-// draws the flappy bird
+// Draws the flappy bird
 const drawPlayer = (playerObj) => {
   let playerImg = new Image();
   playerImg.src = "./images/bird.png";
@@ -170,7 +177,7 @@ const drawPlayer = (playerObj) => {
   );
 };
 
-// draws the walls
+// Draws the obstacles
 const drawObstacles = (obstacles) => {
   for (let i = 0; i < obstacles.length; i++) {
     let currentObstacle = obstacles[i];
@@ -188,7 +195,7 @@ const drawObstacles = (obstacles) => {
   }
 };
 
-// generate walls with randomly-placed gaps in an array
+// Generate walls with randomly-placed gaps in an array
 const generateObstacles = () => {
   let yPos = Math.floor(Math.random() * canvas.height);
   let xPos = canvas.width;
@@ -200,7 +207,7 @@ const generateObstacles = () => {
   );
 };
 
-// checks for collisions
+// Checks for collisions
 const registerCollision = (rect1, rect2) => {
   if (
     rect1.x < rect2.x + rect2.width &&
@@ -214,7 +221,7 @@ const registerCollision = (rect1, rect2) => {
   }
 };
 
-// enables player to control movement
+// Enables player to control movement
 window.addEventListener("keydown", function (event) {
   if (event.key === " ") {
     if (playing) {
@@ -225,14 +232,14 @@ window.addEventListener("keydown", function (event) {
   }
 });
 
-// causes bird to fall if not rising
+// Causes bird to fall if not rising
 window.addEventListener("keyup", function (event) {
   if (event.key === " ") {
     player.jump = false;
   }
 });
 
-// sets initial screen
+// Sets initial screen
 window.addEventListener("load", () => {
   ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
   ctx.font = "30px Arial";
