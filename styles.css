@@ -1,5 +1,6 @@
-html, body {
-  height: 100%; 
+html,
+body {
+  height: 100%;
   overflow: hidden;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -21,12 +22,15 @@ table {
   gap: 0.5rem;
 }
 
-th, td {
+th,
+td {
   width: 50%;
   padding: 0.5rem;
 }
 
-table, th, td {
+table,
+th,
+td {
   border: 1px solid black;
 }
 
@@ -46,7 +50,7 @@ th {
 }
 
 #hi-scores {
-  overflow: scroll;
+  overflow: hidden scroll;
 }
 
 #hi-scores::-webkit-scrollbar {
