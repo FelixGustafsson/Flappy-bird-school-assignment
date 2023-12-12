@@ -8,16 +8,21 @@ const ctx = canvas.getContext("2d");
 canvas.width = 500;
 canvas.height = 600;
 
-// global variables
-let playing = false;
-const obstacles = [];
+// global variables relating to gameplay/difficulty
 const gapSize = 120;
 const minGapHeight = 200;
 const maxGapHeight = canvas.height - 125;
-let points = 0;
-let lastTime = Date.now();
+const fallSpeed = 6.25;
+const jumpSpeed = 125;
+const obstacleSpeed = 62.5;
 const spawnDelay = 4;
 let spawnTimer = 0;
+
+// other global variables
+let playing = false;
+const obstacles = [];
+let points = 0;
+let lastTime = Date.now();
 const bgImg = new Image();
 bgImg.src = "./images/background.png";
 let player = {
@@ -67,12 +72,13 @@ const tick = () => {
 
   let now = Date.now();
   let deltaTime = (now - lastTime) / 1000;
+  console.log(deltaTime);
   lastTime = now;
 
   drawPlayer(player);
   drawObstacles(obstacles);
   for (let i = 0; i < obstacles.length; i++) {
-    obstacles[i].x -= 1;
+    obstacles[i].x -= obstacleSpeed * deltaTime;
   }
 
   score.innerText = "Current player score: " + points;
@@ -87,9 +93,9 @@ const tick = () => {
   // moves player
   if (player.jump) {
     player.movement = 0;
-    player.movement -= 2;
+    player.movement -= jumpSpeed * deltaTime;
   } else {
-    player.movement += 0.1;
+    player.movement += fallSpeed * deltaTime;
   }
   player.y += player.movement;
 
@@ -154,6 +160,7 @@ function startGame() {
     movement: 0,
   };
   playing = true;
+  lastTime = Date.now();
   requestAnimationFrame(tick);
 }
 
