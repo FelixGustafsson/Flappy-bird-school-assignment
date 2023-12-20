@@ -18,7 +18,7 @@ const obstacleSpeed = 62.5;
 const spawnDelay = 4;
 let spawnTimer = 0;
 
-// other global variables
+// Other global variables
 let playing = false;
 const obstacles = [];
 let points = 0;
@@ -63,7 +63,7 @@ const renderScoreList = () => {
   highScores.append(table);
 };
 
-// Loads high scores when page is loaded
+// Renders high scores when page is loaded
 highScores.addEventListener("load", renderScoreList());
 
 // Tick function
@@ -72,16 +72,7 @@ const tick = () => {
 
   let now = Date.now();
   let deltaTime = (now - lastTime) / 1000;
-  console.log(deltaTime);
   lastTime = now;
-
-  drawPlayer(player);
-  drawObstacles(obstacles);
-  for (let i = 0; i < obstacles.length; i++) {
-    obstacles[i].x -= obstacleSpeed * deltaTime;
-  }
-
-  score.innerText = "Current player score: " + points;
 
   if (spawnTimer <= 0) {
     generateObstacles();
@@ -90,7 +81,12 @@ const tick = () => {
     spawnTimer -= deltaTime;
   }
 
-  // Moves player
+  // Draws everything
+  drawPlayer(player);
+  drawObstacles(obstacles);
+  score.innerText = "Current player score: " + points;
+
+  // Handles movement
   if (player.jump) {
     player.movement = 0;
     player.movement -= jumpSpeed * deltaTime;
@@ -98,6 +94,10 @@ const tick = () => {
     player.movement += fallSpeed * deltaTime;
   }
   player.y += player.movement;
+
+  for (let i = 0; i < obstacles.length; i++) {
+    obstacles[i].x -= obstacleSpeed * deltaTime;
+  }
 
   // Checks for defeat
   if (
@@ -135,14 +135,15 @@ const endGame = () => {
     canvas.width / 2 - 160,
     canvas.height / 2 - 10
   );
-  let playerName = prompt("Whats your name?");
+  let playerName = prompt("What's your name?");
   saveScore(playerName, points);
   highScores.innerHTML = "";
   renderScoreList();
   score.innerText = "";
+  spawnTimer = 0;
 };
 
-// Saves the latest score to local storage.
+// Saves the latest score to local storage
 function saveScore(name, score) {
   let scoresArray = localStorage.getItem("hi-scores");
   scoresArray = scoresArray ? JSON.parse(scoresArray) : [];
@@ -228,7 +229,7 @@ const registerCollision = (rect1, rect2) => {
   }
 };
 
-// Enables player to control movement
+// Enables player to control movement/start game
 window.addEventListener("keydown", function (event) {
   if (event.key === " ") {
     if (playing) {
