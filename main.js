@@ -64,7 +64,7 @@ const renderScoreList = () => {
 };
 
 // Renders high scores when page is loaded
-highScores.addEventListener("load", renderScoreList());
+window.addEventListener("load", renderScoreList);
 
 // Tick function
 const tick = () => {
@@ -203,12 +203,12 @@ const drawObstacles = (obstacles) => {
   }
 };
 
-// Generate walls with randomly-placed gaps in an array
+// Generates walls with randomly-placed gaps in an array
 const generateObstacles = () => {
   let yPos = Math.floor(Math.random() * canvas.height);
   let xPos = canvas.width;
-  yPos < minGapHeight ? (yPos = minGapHeight) : (yPos = yPos);
-  yPos > maxGapHeight ? (yPos = maxGapHeight) : (yPos = yPos);
+  yPos = yPos < minGapHeight ? minGapHeight : yPos;
+  yPos = yPos > maxGapHeight ? maxGapHeight : yPos;
   obstacles.push(
     { x: xPos, y: 0, width: 70, height: yPos - gapSize },
     { x: xPos, y: yPos, width: 70, height: canvas.height - yPos }
